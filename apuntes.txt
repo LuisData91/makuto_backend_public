@@ -1,0 +1,5 @@
+pip freeze > requirements.txt : actualiza lista de librerias instaladas en el entorno virtual (venv).
+pip install -r requirements.txt : instala las librerias desde el archivo requirements.txt
+flask db init : inicializo mi proyecto con la carpeta migrations donde almacenaran todas las migraciones
+flask db migrate -m "mensaje" : crea una nueva migración con los cambios en nuestros modelos (tablas en BD).
+flask db upgrade : actualiza las tablas en la BD con la ultima migracion.
