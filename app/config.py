@@ -9,7 +9,7 @@ class Config():
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = config("SECRET_KEY")
     JWT_SECRET_KEY = config("JWT_SECRET")
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1, minutes=30)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=20, minutes=30)
     JWT_TOKEN_LOCATION = ["headers"]
     JWT_HEADER_NAME = "Authorization"
     JWT_HEADER_TYPE = "Bearer" 
@@ -18,27 +18,35 @@ class Config():
 class DevelopmentConfig(Config):
     DEBUG = True
 
-    # SERVER = config("SQL_SERVER")
-    # DATABASE = config("SQL_DATABASE_QAS")
-    # USERNAME = config("SQL_USERNAME")
-    # PASSWORD = quote_plus(config("SQL_PASSWORD"))
+    DRIVER = config("SQL_DRIVER", default="ODBC Driver 18 for SQL Server")
+    SERVER = config("SQL_SERVER")
+    DATABASE = config("SQL_DATABASE_QAS")
+    USERNAME = config("SQL_USERNAME")
+    PASSWORD = config("SQL_PASSWORD")
 
-    # SQLALCHEMY_DATABASE_URI = (
-    #     f"mysql+pymysql://{USERNAME}:{PASSWORD}@{SERVER}/{DATABASE}?charset=utf8mb4"
-    # )
+    PASSWORD_ENCODED = quote_plus(PASSWORD)
+
+    SQLALCHEMY_DATABASE_URI = (
+        f"mssql+pyodbc://{USERNAME}:{PASSWORD_ENCODED}@{SERVER}/{DATABASE}"
+        f"?driver={DRIVER}&Encrypt=yes&TrustServerCertificate=yes"
+    )
 
 # Ambiente de Producción
 class ProductionConfig(Config):
     DEBUG = False
 
-    # SERVER = config("SQL_SERVER")
-    # DATABASE = config("SQL_DATABASE_PROD")
-    # USERNAME = config("SQL_USERNAME")
-    # PASSWORD = quote_plus(config("SQL_PASSWORD"))
+    DRIVER = config("SQL_DRIVER", default="ODBC Driver 18 for SQL Server")
+    SERVER = config("SQL_SERVER")
+    DATABASE = config("SQL_DATABASE_PROD")
+    USERNAME = config("SQL_USERNAME")
+    PASSWORD = config("SQL_PASSWORD")
 
-    # SQLALCHEMY_DATABASE_URI = (
-    #     f"mysql+pymysql://{USERNAME}:{PASSWORD}@{SERVER}/{DATABASE}?charset=utf8mb4"
-    # )
+    PASSWORD_ENCODED = quote_plus(PASSWORD)
+
+    SQLALCHEMY_DATABASE_URI = (
+        f"mssql+pyodbc://{USERNAME}:{PASSWORD_ENCODED}@{SERVER}/{DATABASE}"
+        f"?driver={DRIVER}&Encrypt=yes&TrustServerCertificate=yes"
+    )
 
 def get_config(name: str | None):
     name = (name or config("FLASK_ENV") or "dev").lower()
