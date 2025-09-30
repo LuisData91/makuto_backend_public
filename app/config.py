@@ -1,8 +1,18 @@
 from decouple import config
 from urllib.parse import quote_plus
 from datetime import timedelta
+import pyodbc
 
-# Configuración General
+def _pick_driver():
+    prefer = config("SQL_DRIVER", default="ODBC Driver 18 for SQL Server")
+    installed = set(pyodbc.drivers())
+    if prefer in installed:
+        return prefer
+    for cand in ("ODBC Driver 18 for SQL Server", "ODBC Driver 17 for SQL Server", "SQL Server"):
+        if cand in installed:
+            return cand
+    raise RuntimeError(f"No hay driver ODBC de SQL Server instalado. Vistos: {installed}")
+
 class Config():
     DEBUG = False
     TESTING = False
@@ -12,45 +22,36 @@ class Config():
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=20, minutes=30)
     JWT_TOKEN_LOCATION = ["headers"]
     JWT_HEADER_NAME = "Authorization"
-    JWT_HEADER_TYPE = "Bearer" 
+    JWT_HEADER_TYPE = "Bearer"
 
-# Ambiente de Desarrollo
 class DevelopmentConfig(Config):
     DEBUG = True
 
-    DRIVER = config("SQL_DRIVER", default="ODBC Driver 18 for SQL Server")
+    DRIVER = _pick_driver()                      
     SERVER = config("SQL_SERVER")
     DATABASE = config("SQL_DATABASE_QAS")
     USERNAME = config("SQL_USERNAME")
     PASSWORD = config("SQL_PASSWORD")
 
-    PASSWORD_ENCODED = quote_plus(PASSWORD)
-
     SQLALCHEMY_DATABASE_URI = (
-        f"mssql+pyodbc://{USERNAME}:{PASSWORD_ENCODED}@{SERVER}/{DATABASE}"
-        f"?driver={DRIVER}&Encrypt=yes&TrustServerCertificate=yes"
+        f"mssql+pyodbc://{USERNAME}:{quote_plus(PASSWORD)}@{SERVER}/{DATABASE}"
+        f"?driver={quote_plus(DRIVER)}&Encrypt=yes&TrustServerCertificate=yes"
     )
 
-# Ambiente de Producción
 class ProductionConfig(Config):
     DEBUG = False
 
-    DRIVER = config("SQL_DRIVER", default="ODBC Driver 18 for SQL Server")
+    DRIVER = _pick_driver()
     SERVER = config("SQL_SERVER")
     DATABASE = config("SQL_DATABASE_PROD")
     USERNAME = config("SQL_USERNAME")
     PASSWORD = config("SQL_PASSWORD")
 
-    PASSWORD_ENCODED = quote_plus(PASSWORD)
-
     SQLALCHEMY_DATABASE_URI = (
-        f"mssql+pyodbc://{USERNAME}:{PASSWORD_ENCODED}@{SERVER}/{DATABASE}"
-        f"?driver={DRIVER}&Encrypt=yes&TrustServerCertificate=yes"
+        f"mssql+pyodbc://{USERNAME}:{quote_plus(PASSWORD)}@{SERVER}/{DATABASE}"
+        f"?driver={quote_plus(DRIVER)}&Encrypt=yes&TrustServerCertificate=yes"
     )
 
 def get_config(name: str | None):
     name = (name or config("FLASK_ENV") or "dev").lower()
-    return {
-        "dev": DevelopmentConfig,
-        "prod": ProductionConfig,
-    }.get(name, DevelopmentConfig)
+    return {"dev": DevelopmentConfig, "prod": ProductionConfig}.get(name, DevelopmentConfig)

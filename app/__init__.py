@@ -3,6 +3,7 @@ from .config import get_config
 from .extensions import db
 
 # Lista de Rutas
+from app.routes.maestros.cliente import cliente_bp
 
 def create_app(config_name: str | None=None)-> Flask:
     app = Flask(__name__)
@@ -20,5 +21,6 @@ def create_app(config_name: str | None=None)-> Flask:
         }, 200
     
     # Lista de Blueprint
+    app.register_blueprint(cliente_bp)
     
     return app
