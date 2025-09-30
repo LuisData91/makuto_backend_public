@@ -1,1 +1,13 @@
 pruebas ranch 
+git config --global user.name "Luis Apaza"
+git config --global user.email "luis.apaza@bakels.com.pe"
+CREAR UNA RAMA
+git checkout -b prueba/luis-inicio
+git status
+SUBIR LOS CAMBIOS
+git add .
+git commit -m "chore: prueba inicial de flujo en rama"
+ENVIAR LOS CAMBIOS AL REMOTO
+git push -u origin prueba/luis-inicio
+
+
