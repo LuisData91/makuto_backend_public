@@ -9,5 +9,19 @@ git add .
 git commit -m "chore: prueba inicial de flujo en rama"
 ENVIAR LOS CAMBIOS AL REMOTO
 git push -u origin prueba/luis-inicio
+COMBINAR RAMAS
+# Cambia a la rama main
+git checkout main
+#Aceptar y guardar: Esc → :wq → Enter
+
+# Trae los últimos cambios del remoto (opcional pero recomendable)
+git pull origin main
+
+# Fusiona los cambios de la rama prueba/luis-inicio
+git merge prueba/luis-inicio
+
+git push origin main
+
+
 
 
