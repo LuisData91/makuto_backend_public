@@ -7,7 +7,7 @@ class ClienteModel(db.Model):
     cod = db.Column("A1_COD",db.string(15))
     nombre = db.Column("A1_NOME",db.string(80))
     estado = db.Column("A1_MSBLQL",db.string(1))
-    delete=db.Column("D_E_L_E_T_",db.Integer)
+    delete=db.Column("D_E_L_E_T_",db.varchar(1))
     
 
     
