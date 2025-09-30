@@ -1,0 +1,1 @@
+from .cliente import cliente_bp
