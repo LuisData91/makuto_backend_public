@@ -80,18 +80,18 @@ def general():
 @familia_bp.get("/<int:idFamilia>")
 def registro(idFamilia: int):
     try:
-        cliente = FamiliaModel.query.filter(
+        familia = FamiliaModel.query.filter(
             FamiliaModel.delete == "",
-            FamiliaModel.cli_id == idFamilia
+            FamiliaModel.id_fam == idFamilia
         ).first()
 
     except Exception as e:
         return {"message": "Ocurrió un error inesperado", "content": str(e)}, 500
 
-    if cliente is None:
+    if familia is None:
         return {"message": "Familia no encontrado", "content": None}, 404
 
     return {
         "message": "Familia encontrado",
-        "content": familia_output_schema.dump(cliente)
+        "content": familia_output_schema.dump(familia)
     }, 200
