@@ -8,6 +8,3 @@ class ClienteModel(db.Model):
     nombre = db.Column("A1_NOME",db.String(80))
     estado = db.Column("A1_MSBLQL",db.String(1))
     delete=db.Column("D_E_L_E_T_",db.String(1))
-    
-
-    
