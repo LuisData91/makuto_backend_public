@@ -8,6 +8,7 @@ from app.routes.maestros.familia import familia_bp
 from app.routes.maestros.producto import producto_bp
 from app.routes.maestros.tecnico import tecnico_bp
 from app.routes.maestros.vendedor import vendedor_bp
+from app.routes.maestros.visita import visita_bp 
 
 def create_app(config_name: str | None=None)-> Flask:
     app = Flask(__name__)
@@ -30,5 +31,6 @@ def create_app(config_name: str | None=None)-> Flask:
     app.register_blueprint(producto_bp)
     app.register_blueprint(tecnico_bp)
     app.register_blueprint(vendedor_bp)
+    app.register_blueprint(visita_bp)
     
     return app
