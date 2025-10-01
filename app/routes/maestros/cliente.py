@@ -30,7 +30,7 @@ def general():
         query = ClienteModel.query.filter(
             ClienteModel.delete == "",
             ClienteModel.estado == "2"
-        ).all()
+        )
 
         # Búsqueda
         if q:
