@@ -217,7 +217,7 @@ def eliminar(tec_id: str):
             db.session.commit()
 
             return {
-                "message": "tcnico eliminada satisfactoriamente",
+                "message": "técnico eliminada satisfactoriamente",
                 
             }, 200
 
