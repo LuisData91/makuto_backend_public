@@ -199,3 +199,28 @@ def modificar(tec_id: str):
     except Exception as e:
         db.session.rollback()
         return {"message": "Ocurrió un error inesperado", "content": str(e)}, 500
+    
+
+
+
+@tecnico_bp.route("/<string:tec_id>", methods=["DELETE"])
+def eliminar(tec_id: str):
+        try:
+            tecnico = (
+                db.session.query(TecnicosModel)
+                .filter(TecnicosModel.cod_tec == tec_id)
+                .first()
+            )
+            tecnico.estado = '2'
+            db.session.add(tecnico)
+
+            db.session.commit()
+
+            return {
+                "message": "tcnico eliminada satisfactoriamente",
+                
+            }, 200
+
+        except Exception:
+            db.session.rollback()
+            return {"message": "Ocurrió un error inesperado", "content": []}, 500
