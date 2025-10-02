@@ -33,4 +33,5 @@ def create_app(config_name: str | None=None)-> Flask:
     app.register_blueprint(vendedor_bp)
     app.register_blueprint(visita_bp)
     
+    
     return app

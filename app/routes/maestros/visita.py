@@ -45,7 +45,7 @@ def general():
                 query = query.filter(TipoVisitaModel.descripcion.like(f"%{nombre}%"))
 
         # Orden por nombre
-        query = query.order_by(TipoVisitaModel.nombre.asc())
+        query = query.order_by(TipoVisitaModel.descripcion.asc())
 
         # Paginación
         try:

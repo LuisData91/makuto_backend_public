@@ -1,13 +1,18 @@
-from flask import Blueprint, request
+from flask import Blueprint, request,jsonify
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
+from marshmallow import ValidationError
+from datetime import datetime, timezone
 from app.models.maestros.md_tecnicos import TecnicosModel
-from app.schemas.maestros.tecnicoDTO import TecnicoResponseDTO
+from app.schemas.maestros.tecnicoDTO import TecnicoResponseDTO, TecnicoCreateRequestDTO,TecnicoUpdateRequestDTO
 from app.extensions import db
 
 tecnico_bp = Blueprint('tecnico', __name__, url_prefix='/tecnico')
 
 tecnico_output_schema = TecnicoResponseDTO()
 tecnico_output_lista_schema = TecnicoResponseDTO(many=True)
+tecnico_create_schema = TecnicoCreateRequestDTO()
+tecnico_update_schema = TecnicoUpdateRequestDTO()
 
 @tecnico_bp.get("")
 def general():
@@ -89,3 +94,108 @@ def registro(idTecnico: str):
         "message": "Tecnico encontrado",
         "content": tecnico_output_schema.dump(tecnico)
     }, 200
+
+    # RUTA PARA AGREGAR REGISTRO
+@tecnico_bp.post("")
+def crear():
+        
+        if not request.is_json:
+            return jsonify({
+                "message": "El cuerpo de la solicitud debe ser JSON.",
+                "content": []
+            }), 400
+
+        json_data = request.get_json(silent=True) or {}
+
+        try:
+            tecnico = tecnico_create_schema.load(json_data)
+            db.session.add(tecnico)
+            
+            db.session.commit()
+
+            result = tecnico_output_schema.dump(tecnico)
+            return {
+                "message": "Técnico creada satisfactoriamente",
+                "content": result
+            }, 201
+
+        except ValidationError as err:
+            db.session.rollback()
+            return {"message": "Algunos datos son incorrectos", "content": err.messages}, 400
+
+        except IntegrityError as err:
+            db.session.rollback()
+
+            msg = "Violación de unicidad en base de datos."
+            # (Opcional) extrae info de MySQL: err.orig.args si necesitas el código
+            return {"message": "Algunos datos son incorrectos", "content": {"_schema": [msg]}}, 400
+
+        except Exception:
+            db.session.rollback()
+  
+            return {"message": "Ocurrió un error inesperado", "content": []}, 500
+        
+# -------ACTUALIZAR REGISTRO-------
+@tecnico_bp.route("/<string:tec_id>", methods=["PUT"])
+def modificar(tec_id: str):
+    try:
+        # Buscar el registro
+        tecnico = (
+            db.session.query(TecnicosModel)
+            .filter(TecnicosModel.cod_tec == tec_id)
+            .first()
+        )
+    except Exception as e:
+        return {"message": "Ocurrió un error inesperado", "content": str(e)}, 500
+
+    if not tecnico:
+        return {"message": "tecnico no encontrada", "content": []}, 404
+
+    if not request.is_json:
+        return jsonify({
+            "message": "El cuerpo de la solicitud debe ser JSON.",
+            "content": []
+        }), 400
+
+    json_data = request.get_json(silent=True) or {}
+
+    try:
+        # Validar payload
+        try:
+            data = tecnico_update_schema.load(json_data, partial=False)
+        except ValidationError as err:
+            return jsonify({"message": "Algunos datos son incorrectos", "content": err.messages}), 400
+
+        # Aplicar cambios
+        for field, value in data.items():
+            setattr(tecnico, field, value)
+
+        db.session.add(tecnico)
+        db.session.commit()
+
+        # Serializar estado final
+        datos_nuevos = tecnico_output_schema.dump(tecnico)
+
+        return {
+            "message": "Técnico actualizada satisfactoriamente",
+            "content": datos_nuevos
+        }, 200
+
+    except ValidationError as err:
+        db.session.rollback()
+        return jsonify({
+            "message": "Algunos datos son incorrectos",
+            "content": err.messages
+        }), 400
+
+    except IntegrityError:
+        db.session.rollback()
+        msg = "Violación de unicidad en base de datos."
+        return jsonify({
+            "message": "Algunos datos son incorrectos",
+            "content": {"_schema": [msg]}
+        }), 400
+
+    except Exception as e:
+        db.session.rollback()
+        return {"message": "Ocurrió un error inesperado", "content": str(e)}, 500
