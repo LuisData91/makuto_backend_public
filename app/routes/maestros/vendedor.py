@@ -1,18 +1,15 @@
 from flask import Blueprint, request
 from sqlalchemy import or_
-from app.models.maestros.md_familia import FamiliaModel
-from app.schemas.maestros.familiaDTO import FamiliaResponseDTO
+from app.models.maestros.md_vendedor import VendedorModel
+from app.schemas.maestros.vendedorDTO import VendedorResponseDTO
 from app.extensions import db
 
+vendedor_bp = Blueprint('vendedor', __name__, url_prefix='/vendedor')
 
-familia_bp = Blueprint('familia', __name__, url_prefix='/familia')
+vendedor_output_schema = VendedorResponseDTO()
+vendedor_output_lista_schema = VendedorResponseDTO(many=True)
 
-familia_output_schema = FamiliaResponseDTO()
-familia_output_lista_schema = FamiliaResponseDTO(many=True)
-
-
-
-@familia_bp.get("")
+@vendedor_bp.get("")
 def general():
     try:
         # Parámetros de búsqueda
@@ -30,26 +27,26 @@ def general():
         except ValueError:
             per_page = 20
 
-        query = FamiliaModel.query.filter(
-            FamiliaModel.delete == "",
-           
+        query = VendedorModel.query.filter(
+            VendedorModel.delete == "",
+            VendedorModel.estado == "2"
         )
 
         # Búsqueda
         if q:
             like = f"%{q}%"
             query = query.filter(or_(
-                FamiliaModel.cod.like(like),
-                FamiliaModel.descripcion.like(like),
+                VendedorModel.cod.like(like),
+                VendedorModel.nombre.like(like),
             ))
         else:
             if codigo:
-                query = query.filter(FamiliaModel.cod.like(f"%{codigo}%"))
+                query = query.filter(VendedorModel.cod.like(f"%{codigo}%"))
             if nombre:
-                query = query.filter(FamiliaModel.descripcion.like(f"%{nombre}%"))
+                query = query.filter(VendedorModel.nombre.like(f"%{nombre}%"))
 
         # Orden por nombre
-        query = query.order_by(FamiliaModel.descripcion.asc())
+        query = query.order_by(VendedorModel.nombre.asc())
 
         # Paginación
         try:
@@ -57,10 +54,10 @@ def general():
         except AttributeError:
             paginated = db.paginate(query, page=page, per_page=per_page, error_out=False)
 
-        data = familia_output_lista_schema.dump(paginated.items)
+        data =vendedor_output_lista_schema.dump(paginated.items)
 
         return {
-            "message": "Lista de Familia",
+            "message": "Lista de Vendedores",
             "content": data,
             "pagination": {
                 "page": page,
@@ -74,24 +71,22 @@ def general():
     
     except Exception as e:
         return {"message": "Ocurrió un error inesperado", "content": str(e)}, 500
-    
 
-
-@familia_bp.get("/<int:idFamilia>")
-def registro(idFamilia: int):
+@vendedor_bp.get("/<string:idVendedor>")
+def registro(idVendedor: str):
     try:
-        familia = FamiliaModel.query.filter(
-            FamiliaModel.delete == "",
-            FamiliaModel.id_fam == idFamilia
+        vendedor = VendedorModel.query.filter(
+            VendedorModel.delete == "",
+            VendedorModel.cod == idVendedor
         ).first()
 
     except Exception as e:
         return {"message": "Ocurrió un error inesperado", "content": str(e)}, 500
 
-    if familia is None:
-        return {"message": "Familia no encontrado", "content": None}, 404
+    if vendedor is None:
+        return {"message": "Vendedor no encontrado", "content": None}, 404
 
     return {
-        "message": "Familia encontrado",
-        "content": familia_output_schema.dump(familia)
+        "message": "Vendedor encontrado",
+        "content": vendedor_output_schema.dump(vendedor)
     }, 200

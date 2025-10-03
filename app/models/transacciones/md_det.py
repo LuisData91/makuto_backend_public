@@ -6,4 +6,4 @@ class detModel(db.Model):
     id = db.Column("IDDET", db.Integer, primary_key=True)
     id_cab = db.Column("IDCAB",db.Integer)
     cod_prod = db.Column("ID_PROD",db.String(15))
-    estado = db.Column("ESTADO",db.Integer)
+    estado = db.Column("ESTADO",db.Integer,default=1)
