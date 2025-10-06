@@ -1,5 +1,8 @@
+from sqlalchemy import func, and_
 from flask import Blueprint, request, jsonify
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from sqlalchemy import func ,literal_column, or_,and_
+from sqlalchemy.orm import aliased
 from app.extensions import db
 from app.models.transacciones.md_cabRegIT import cabRegITModel
 from app.models.transacciones.md_det import detModel
@@ -8,6 +11,11 @@ from app.schemas.maestros.form_visitaDTO import (
     cabRegITCreateRequestDTO, cabRegITUpdateRequestDTO, cabRegITResponseDTO,
     detCreateRequestDTO, detUpdateRequestDTO, detResponseDTO
 )
+from app.models.maestros.md_cliente import ClienteModel   # SA1010
+from app.models.maestros.md_vendedor import VendedorModel # SA3010
+from app.models.maestros.md_visita import TipoVisitaModel     # BKS0088 (motivo)
+from app.models.maestros.md_tecnicos import TecnicosModel 
+
 
 bp_visitas = Blueprint("visitas", __name__, url_prefix="/api/visitas")
 
@@ -292,8 +300,81 @@ def update_visita_full(idcab):
         db.session.rollback()
         return fail(str(e))
 
+# ==================LISTA PARA LA GRILLA (JOIN)==================
 
 
+@bp_visitas.get("/grilla")
+def grilla_visitas():
+    page = request.args.get("page", type=int, default=1)
+    size = request.args.get("size", type=int, default=20)
+    qtext = (request.args.get("q") or "").strip()
+    id_tec= request.args.get("id_tec")
+    id_vend = request.args.get("id_vend")
+    id_clien = request.args.get("id_clien")
+    id_motivo = request.args.get("id_motivo", type=int)
+    fecha_desde = request.args.get("fecha_desde")
+    fecha_hasta = request.args.get("fecha_hasta")
 
+    Cab = cabRegITModel
+    Cli = aliased(ClienteModel)        # SA1010
+    Ven = aliased(VendedorModel)       # SA3010
+    Mot = aliased(TipoVisitaModel)     # BKS0088
+    Tec = aliased(TecnicosModel)       # BKS0087
 
+    fconv = func.convert(literal_column("DATE"), Cab.fecha_dig, literal_column("103"))
 
+    query = (
+        db.session.query(
+            Cab.correlativo.label("correlativo"),
+            Tec.nombre.label("tecnico"),
+            Ven.nombre.label("vendedor"),
+            Cli.nombre.label("cliente"),
+            Cab.fecha_dig.label("fecha_dig"),
+            Mot.descripcion.label("motivo"),
+        )
+        .join(Tec, and_(Tec.cod_tec == Cab.id_tec, Tec.estado == '1'))
+        .join(Ven, and_(Ven.cod == Cab.id_vend, Ven.estado == '2', Ven.delete == ''))  # <-- '' vacío
+        .join(Cli, and_(Cli.cod == Cab.id_clien, Cli.estado == '2', Cli.delete == '')) # <-- '' vacío
+        .join(Mot, Mot.id_visita == Cab.id_motivo)
+        .filter(Cab.estado == 1)
+        .filter(Cli.loja == '01')  # <-- ahora existe el atributo
+    )
+
+    if id_vend:
+        query = query.filter(Cab.id_vend == id_vend)
+    if id_clien:
+        query = query.filter(Cab.id_clien == id_clien)
+    if id_motivo is not None:
+        query = query.filter(Cab.id_motivo == id_motivo)
+
+    if qtext:
+        like = f"%{qtext}%"
+        query = query.filter(or_(Cab.correlativo.like(like), Ven.nombre.like(like), Cli.nombre.like(like)))
+
+    if fecha_desde:
+        query = query.filter(fconv >= func.convert(literal_column("DATE"), fecha_desde, literal_column("103")))
+    if fecha_hasta:
+        query = query.filter(fconv <= func.convert(literal_column("DATE"), fecha_hasta, literal_column("103")))
+
+    query = query.order_by(fconv.desc(), Cab.correlativo.desc())
+
+    pag = query.paginate(page=page, per_page=size, error_out=False)
+
+    items = [
+        {
+            "correlativo": r.correlativo,
+            "tecnico": r.tecnico,
+            "vendedor": r.vendedor,
+            "cliente": r.cliente,
+            "fecha_dig": r.fecha_dig,
+            "motivo": r.motivo,
+        }
+        for r in pag.items
+    ]
+
+    return ok({
+        "items": items,
+        "page": pag.page,
+        "pages": pag.pages,
+        "total": pag.total,
+    })
