@@ -4,3 +4,6 @@ from .producto import producto_bp
 from .tecnico import tecnico_bp
 from .vendedor import vendedor_bp
 from .visita import visita_bp
+from .usuario import usuarios_bp
+from .form_visita import bp_visitas
+from .proxy import proxy_bp

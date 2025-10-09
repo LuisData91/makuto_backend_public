@@ -4,3 +4,6 @@ from .maestros import producto_bp
 from .maestros import tecnico_bp
 from .maestros import vendedor_bp
 from .maestros import visita_bp
+from .maestros import usuarios_bp
+from .maestros import bp_visitas
+from .maestros import proxy_bp

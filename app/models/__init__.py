@@ -6,3 +6,4 @@ from .transacciones import  detModel
 from .maestros import  TecnicosModel
 from .maestros import  FamiliaModel
 from .maestros import  TipoVisitaModel
+from .maestros import Usuario
