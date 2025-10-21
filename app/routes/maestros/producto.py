@@ -8,6 +8,7 @@ producto_bp = Blueprint('producto', __name__, url_prefix='/producto')
 
 producto_output_schema = ProductoResponseDTO()
 producto_output_lista_schema = ProductoResponseDTO(many=True)
+TipoProd=['ME','PT']
 
 @producto_bp.get("")
 def general():
@@ -29,7 +30,8 @@ def general():
 
         query = ProductoModel.query.filter(
             ProductoModel.delete == "",
-            ProductoModel.estado == "2"
+            ProductoModel.estado == "2",
+            ProductoModel.tipo.in_(TipoProd)
         )
 
         # Búsqueda
@@ -77,7 +79,8 @@ def registro(idProducto: str):
     try:
         producto = ProductoModel.query.filter(
             ProductoModel.delete == "",
-            ProductoModel.cod == idProducto
+            ProductoModel.cod == idProducto,
+            ProductoModel.tipo.in_(TipoProd)
         ).first()
 
     except Exception as e:

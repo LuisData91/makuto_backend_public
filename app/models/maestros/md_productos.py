@@ -8,3 +8,5 @@ class ProductoModel(db.Model):
     nombre = db.Column("B1_DESC",db.String(60))
     estado = db.Column("B1_MSBLQL",db.String(1))
     delete=db.Column("D_E_L_E_T_",db.String(1))
+    tipo=db.Column("B1_TIPO",db.String(2))
+    grupo=db.Column("B1_GRUPO",db.String(4))
