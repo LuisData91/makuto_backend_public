@@ -8,3 +8,4 @@ class VendedorModel(db.Model):
     nombre = db.Column("A3_NOME",db.String(40))
     estado = db.Column("A3_MSBLQL",db.String(1))
     delete=db.Column("D_E_L_E_T_",db.String(1))
+    grupo=db.Column("A3_GRPREP",db.String(2))

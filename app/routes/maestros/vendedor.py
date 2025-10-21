@@ -8,6 +8,7 @@ vendedor_bp = Blueprint('vendedor', __name__, url_prefix='/vendedor')
 
 vendedor_output_schema = VendedorResponseDTO()
 vendedor_output_lista_schema = VendedorResponseDTO(many=True)
+GRUPOS_PERMITIDOS = ['LA','LM','LV','LS','IC','HY','HU','AQ','CU','JU','TR','CH','PI']
 
 @vendedor_bp.get("")
 def general():
@@ -29,7 +30,8 @@ def general():
 
         query = VendedorModel.query.filter(
             VendedorModel.delete == "",
-            VendedorModel.estado == "2"
+            VendedorModel.estado == "2",
+            VendedorModel.grupo.in_(GRUPOS_PERMITIDOS)
         )
 
         # Búsqueda
@@ -47,6 +49,7 @@ def general():
 
         # Orden por nombre
         query = query.order_by(VendedorModel.nombre.asc())
+        
 
         # Paginación
         try:
@@ -69,6 +72,7 @@ def general():
             }
         }, 200
     
+    
     except Exception as e:
         return {"message": "Ocurrió un error inesperado", "content": str(e)}, 500
 
@@ -77,7 +81,9 @@ def registro(idVendedor: str):
     try:
         vendedor = VendedorModel.query.filter(
             VendedorModel.delete == "",
-            VendedorModel.cod == idVendedor
+            VendedorModel.cod == idVendedor,
+            VendedorModel.grupo.in_(GRUPOS_PERMITIDOS)
+
         ).first()
 
     except Exception as e:

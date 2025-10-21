@@ -8,6 +8,7 @@ cliente_bp = Blueprint('cliente', __name__, url_prefix='/cliente')
 
 cliente_output_schema = ClienteResponseDTO()
 cliente_output_lista_schema = ClienteResponseDTO(many=True)
+SEDE='01'
 
 @cliente_bp.get("")
 def general():
@@ -29,7 +30,8 @@ def general():
 
         query = ClienteModel.query.filter(
             ClienteModel.delete == "",
-            ClienteModel.estado == "2"
+            ClienteModel.estado == "2",
+            ClienteModel.loja== SEDE
         )
 
         # Búsqueda
@@ -77,7 +79,8 @@ def registro(idCliente: int):
     try:
         cliente = ClienteModel.query.filter(
             ClienteModel.delete == "",
-            ClienteModel.cli_id == idCliente
+            ClienteModel.cli_id == idCliente,
+            ClienteModel.loja== SEDE
         ).first()
 
     except Exception as e:
