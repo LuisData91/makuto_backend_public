@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from app.models.maestros.md_tecnicos import TecnicosModel
 from app.schemas.maestros.tecnicoDTO import TecnicoResponseDTO, TecnicoCreateRequestDTO,TecnicoUpdateRequestDTO
 from app.extensions import db
+from sqlalchemy.orm import joinedload
 
 tecnico_bp = Blueprint('tecnico', __name__, url_prefix='/tecnico')
 
@@ -32,8 +33,14 @@ def general():
         except ValueError:
             per_page = 20
 
-        query = TecnicosModel.query.filter(
-                TecnicosModel.estado == "1"
+        # query = TecnicosModel.query.filter(
+        #         TecnicosModel.estado == "1"
+        # )
+
+        query = (
+            TecnicosModel.query
+            .options(joinedload(TecnicosModel.user))
+            .filter(TecnicosModel.estado == "1")
         )
 
         # Búsqueda
@@ -79,10 +86,16 @@ def general():
 @tecnico_bp.get("/<string:idTecnico>")
 def registro(idTecnico: str):
     try:
-        tecnico = TecnicosModel.query.filter(
-            
-            TecnicosModel.cod_tec == idTecnico
-        ).first()
+    
+        tecnico = (
+            TecnicosModel.query
+            .options(joinedload(TecnicosModel.user))
+            .filter(
+                TecnicosModel.cod_tec == idTecnico,
+                TecnicosModel.estado == "1"
+            )
+            .first()
+        )
 
     except Exception as e:
         return {"message": "Ocurrió un error inesperado", "content": str(e)}, 500
@@ -94,6 +107,7 @@ def registro(idTecnico: str):
         "message": "Tecnico encontrado",
         "content": tecnico_output_schema.dump(tecnico)
     }, 200
+
 
     # RUTA PARA AGREGAR REGISTRO
 @tecnico_bp.post("")
@@ -200,9 +214,6 @@ def modificar(tec_id: str):
         db.session.rollback()
         return {"message": "Ocurrió un error inesperado", "content": str(e)}, 500
     
-
-
-
 @tecnico_bp.route("/<string:tec_id>", methods=["DELETE"])
 def eliminar(tec_id: str):
         try:

@@ -29,7 +29,6 @@ class detCreateRequestDTO(Schema):
     def make_model(self, data, **kwargs):
         return detModel(**data)
     
-
 class detUpdateRequestDTO(Schema):
     class Meta:
         unknown = EXCLUDE
@@ -48,6 +47,7 @@ class detUpdateRequestDTO(Schema):
             "null": "El campo Cod producto no puede ser nulo."
         }
     ) 
+
 class detResponseDTO(Schema):
     id = fields.Int(dump_only=True)
     cod_prod = fields.Str(dump_only=True)
@@ -96,7 +96,7 @@ class cabRegITCreateRequestDTO(Schema):
         validate=validate.Range(min=1)
     )
     correlativo = fields.String(
-        required=True, 
+        required=False, 
         # strict=True, 
         error_messages={
             "required": "El campo Fecha es obligatorio.",
@@ -142,7 +142,7 @@ class cabRegITUpdateRequestDTO(Schema):
         validate=validate.Range(min=1)
     )
     correlativo = fields.String(
-        required=True, 
+        required=False, 
         # strict=True, 
         error_messages={
             "required": "El campo Fecha es obligatorio.",
