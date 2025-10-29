@@ -12,6 +12,7 @@ from app.routes.maestros.vendedor import vendedor_bp
 from app.routes.maestros.visita import visita_bp 
 from app.routes.maestros.form_visita import bp_visitas
 from app.routes.maestros.usuario import usuarios_bp
+from app.routes.maestros.empleados import empleado_bp
 from app.routes.maestros.proxy import proxy_bp
 
 def create_app(config_name: str | None=None)-> Flask:
@@ -39,6 +40,7 @@ def create_app(config_name: str | None=None)-> Flask:
     app.register_blueprint(visita_bp)
     app.register_blueprint(bp_visitas)
     app.register_blueprint(usuarios_bp)
+    app.register_blueprint(empleado_bp)
     app.register_blueprint(proxy_bp, url_prefix="/api")
     
     

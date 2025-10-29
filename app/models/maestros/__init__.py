@@ -4,5 +4,6 @@ from .md_productos import ProductoModel
 from .md_tecnicos  import TecnicosModel
 from .md_familia  import FamiliaModel
 from .md_visita  import TipoVisitaModel
+from .md_empleado  import EmpleadoModel
 from .md_usuarios import Usuario
 
