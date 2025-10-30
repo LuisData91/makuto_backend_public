@@ -30,4 +30,4 @@ COPY . .
 ENV PORT=10000
 
 # Ejecutar con Gunicorn
-CMD ["gunicorn", "-w", "3", "-b", "0.0.0.0:${PORT}", "wsgi:app"]
+CMD gunicorn -w 3 -b 0.0.0.0:$PORT wsgi:app
