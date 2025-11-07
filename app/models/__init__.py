@@ -8,3 +8,6 @@ from .maestros import  FamiliaModel
 from .maestros import  TipoVisitaModel
 from .maestros import Usuario
 from .maestros import EmpleadoModel
+from .transacciones import SolicitudReclamoModel
+from .transacciones import AdjuntoModel
+

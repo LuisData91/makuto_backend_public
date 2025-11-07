@@ -2,6 +2,8 @@ from flask import Flask
 from .config import get_config
 from .extensions import db
 from flask_cors import CORS
+from .db import db
+
 
 # Lista de Rutas
 from app.routes.maestros.cliente import cliente_bp
@@ -14,6 +16,9 @@ from app.routes.maestros.form_visita import bp_visitas
 from app.routes.maestros.usuario import usuarios_bp
 from app.routes.maestros.empleados import empleado_bp
 from app.routes.maestros.proxy import proxy_bp
+from app.routes.maestros.SolicitudReclamo import solicitud_reclamo_bp
+from app.routes.maestros.Adjunto import adjuntos_bp
+
 
 def create_app(config_name: str | None=None)-> Flask:
     app = Flask(__name__)
@@ -42,6 +47,8 @@ def create_app(config_name: str | None=None)-> Flask:
     app.register_blueprint(usuarios_bp)
     app.register_blueprint(empleado_bp)
     app.register_blueprint(proxy_bp, url_prefix="/api")
+    app.register_blueprint(solicitud_reclamo_bp)
+    app.register_blueprint(adjuntos_bp)
     
     
     return app

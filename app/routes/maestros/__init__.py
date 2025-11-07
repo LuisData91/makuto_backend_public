@@ -7,3 +7,5 @@ from .visita import visita_bp
 from .usuario import usuarios_bp
 from .form_visita import bp_visitas
 from .proxy import proxy_bp
+from .SolicitudReclamo import solicitud_reclamo_bp
+from .Adjunto import adjuntos_bp

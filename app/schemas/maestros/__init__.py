@@ -14,3 +14,10 @@ from .form_visitaDTO import (
     detUpdateRequestDTO,
     detResponseDTO,
 )
+from .SolicitudReclamoDTO import (
+    ReclamoCreateRequestDTO,
+    ReclamoUpdateRequestDTO,
+    SolicitudReclamoResponseDTO,
+)
+
+from .AdjuntoDTO import AdjuntoSchema

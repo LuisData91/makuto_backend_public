@@ -8,3 +8,4 @@ from .maestros import visita_bp
 from .maestros import usuarios_bp
 from .maestros import bp_visitas
 from .maestros import proxy_bp
+from .maestros import adjuntos_bp

@@ -13,4 +13,10 @@ from .maestros import (
     detCreateRequestDTO,
     detUpdateRequestDTO,
     detResponseDTO,
+    ReclamoCreateRequestDTO,
+    SolicitudReclamoResponseDTO,
+    ReclamoUpdateRequestDTO,
+    
+
+    
 )
