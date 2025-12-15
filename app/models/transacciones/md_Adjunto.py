@@ -1,7 +1,8 @@
 # app/models/adjunto.py
 # from app.db import db
 # from app.extensions import db
-from app.db import db
+from app.extensions import db
+
 
 class AdjuntoModel(db.Model):
     __tablename__ = "BKS0092_ADJUNTOS"

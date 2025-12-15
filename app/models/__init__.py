@@ -10,4 +10,5 @@ from .maestros import Usuario
 from .maestros import EmpleadoModel
 from .transacciones import SolicitudReclamoModel
 from .transacciones import AdjuntoModel
+from .transacciones import ReclamoMensajeModel
 

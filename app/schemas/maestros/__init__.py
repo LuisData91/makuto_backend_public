@@ -19,5 +19,10 @@ from .SolicitudReclamoDTO import (
     ReclamoUpdateRequestDTO,
     SolicitudReclamoResponseDTO,
 )
+from .ReclamoEstadoCalidadRequestDTO import ReclamoEstadoCalidadRequestDTO
 
 from .AdjuntoDTO import AdjuntoSchema
+from .ReclamoMensajeDTO import (
+    ReclamoMensajeCreateRequestDTO,
+    ReclamoMensajeResponseDTO,
+)

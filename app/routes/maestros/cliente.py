@@ -110,7 +110,8 @@ def listar_cli_loja():
         # Query base
         query = ClienteModel.query.filter(
             or_(ClienteModel.delete == "", ClienteModel.delete.is_(None)),
-            ClienteModel.estado.in_(("2", 2, "0"))  # puedes ajustar según tu lógica
+            ClienteModel.estado.in_(("2", 2, "0")) ,
+             ClienteModel.loja==SEDE # puedes ajustar según tu lógica
         )
 
         # Búsqueda flexible
@@ -139,16 +140,20 @@ def listar_cli_loja():
         data = []
         for c in paginated.items:
             direccion_completa = " - ".join(
-                s.strip() for s in [c.estado or "", c.distrito or "", c.direccion or ""] if s.strip()
+                s.strip() for s in [
+                    c.departamento or "",  # A1_ESTADO
+                    c.distrito or "",     # A1_BAIRRO
+                    c.direccion or "",    # A1_END
+                ] if s.strip()
             )
 
             data.append({
                 "cli_id": c.cli_id,
-                "codigo": c.cod.strip() if c.cod else "",
-                "nombre": c.nombre.strip() if c.nombre else "",
-                "telefono": c.telefono.strip() if c.telefono else "",
-                "email": c.email.strip() if c.email else "",
-                "direccion_completa": direccion_completa
+                "cod": (c.cod or "").strip(),          # ← antes "codigo"
+                "nombre": (c.nombre or "").strip(),
+                "telefono": (c.telefono or "").strip(),
+                "correo": (c.email or "").strip(),     # ← antes "email"
+                "direccion": direccion_completa or "", # ← antes "direccion_completa"
             })
 
 

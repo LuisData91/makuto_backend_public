@@ -16,7 +16,8 @@ from .maestros import (
     ReclamoCreateRequestDTO,
     SolicitudReclamoResponseDTO,
     ReclamoUpdateRequestDTO,
-    
+    ReclamoEstadoCalidadRequestDTO,
+    ReclamoMensajeDTO, 
 
     
 )

@@ -1,20 +1,43 @@
 
 
 # app/__init__.py
+import os   
 from flask import Flask
 from flask_cors import CORS
 from .config import get_config
-from .extensions import db ,validador # <- solo aquí
+from dotenv import load_dotenv
+# from .extensions import db ,validador , jwt 
+from app.extensions import db, validador, jwt
 
-def create_app(config_name: str | None=None) -> Flask:
+
+def create_app(config_name: str | None = None) -> Flask:
+   
+    load_dotenv()
+
     app = Flask(__name__)
     cfg = get_config(config_name)
     app.config.from_object(cfg)
     CORS(app)
 
+
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret")
+
+  
+    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET", "dev-jwt-secret")
+
+    app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+    app.config["JWT_HEADER_NAME"] = "Authorization"
+    app.config["JWT_HEADER_TYPE"] = "Bearer"
+
+
+    app.config["JWT_COOKIE_CSRF_PROTECT"] = False
+
+
+
     # Inicializa extensiones
     db.init_app(app)
-    validador.init_app(app)  # si usas marshmallow
+    validador.init_app(app)
+    jwt.init_app(app)
 
     @app.get("/")
     def welcome():
@@ -46,5 +69,9 @@ def create_app(config_name: str | None=None) -> Flask:
     app.register_blueprint(proxy_bp, url_prefix="/api")
     app.register_blueprint(solicitud_reclamo_bp)
     app.register_blueprint(adjuntos_bp)
+
+   
+
+
 
     return app

@@ -3,6 +3,7 @@ from marshmallow import Schema, fields, validate
 from app.models.transacciones import SolicitudReclamoModel
 
 class SolicitudReclamoResponseDTO(Schema):
+    id = fields.Int(dump_only=True)  # 👈 ESTA LÍNEA NUEVA
 
     fecha_emision = fields.Str(dump_only=True)
     documento = fields.Str(dump_only=True)
@@ -16,9 +17,13 @@ class SolicitudReclamoResponseDTO(Schema):
     direccion_cliente = fields.Str(dump_only=True)
     fecha_despacho = fields.Str(dump_only=True)
     tipo_reclamo = fields.Str(dump_only=True)
-    descripcion_reclamo = fields.Str(dump_only=True)
+    descripcion_reclamo = fields.String(required=True,validate=validate.Length(max=7000))
     nombre_vendedor = fields.Str(dump_only=True)
     ruta_imagen = fields.Str(dump_only=True)
+
+    respuesta_calidad = fields.String(allow_none=True)
+    id_usuario_calidad = fields.Integer(allow_none=True)
+    fecha_cierre = fields.String(allow_none=True)
     
     
  
@@ -88,7 +93,7 @@ class ReclamoCreateRequestDTO(Schema):
         required=True,
     )
 
-    
+    id_usuario_registro = fields.Int(required=True)
     
 
 class ReclamoUpdateRequestDTO(Schema):
@@ -151,3 +156,5 @@ class ReclamoUpdateRequestDTO(Schema):
     ruta_imagen = fields.Str(
         required=False,
     )
+
+   

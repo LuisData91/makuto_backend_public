@@ -170,3 +170,50 @@ def get_thumbnail_url(item_id: str, size: str = "medium") -> str | None:
     if size == "large":
         return (sizes.get("large") or {}).get("url")
     return (sizes.get("medium") or {}).get("url")
+
+
+
+
+
+
+# ---------- ENVÍO DE CORREO --------------
+
+def send_mail_graph(
+    from_address: str,
+    to_addresses: list[str],
+    subject: str,
+    html_body: str,
+    save_to_sent: bool = True,
+):
+    """
+    Envía un correo usando Microsoft Graph (permiso Mail.Send como Application).
+    - from_address: buzón desde el cual se envía (ej. 'reclamos@tudominio.com')
+    - to_addresses: lista de correos destino
+    - subject: asunto del correo
+    - html_body: cuerpo en HTML
+    """
+
+    # Endpoint: se puede usar el UPN del usuario (correo) en la ruta
+    url = f"https://graph.microsoft.com/v1.0/users/{from_address}/sendMail"
+
+    headers = _auth_headers({"Content-Type": "application/json"})
+
+    message = {
+        "message": {
+            "subject": subject,
+            "body": {
+                "contentType": "HTML",
+                "content": html_body,
+            },
+            "toRecipients": [
+                {"emailAddress": {"address": addr}}
+                for addr in to_addresses
+            ],
+        },
+        "saveToSentItems": save_to_sent,
+    }
+
+    resp = requests.post(url, headers=headers, json=message, timeout=30)
+    resp.raise_for_status()
+    # Si no lanza excepción, el correo se envió OK
+    return True
